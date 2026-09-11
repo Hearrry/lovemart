@@ -76,6 +76,11 @@ function ErrorComponent({ error, reset }: { error: Error; reset: () => void }) {
 
 export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()({
   beforeLoad: async ({ location }) => {
+    // Skip auth check on server-side during SSR if supabase is not properly initialized
+    if (typeof window === "undefined") {
+      return;
+    }
+    
     const { data: { session } } = await supabase.auth.getSession();
     const isAuthRoute = location.pathname.startsWith("/auth");
 
